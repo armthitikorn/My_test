@@ -314,8 +314,8 @@
             }
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                // Use a more efficient MIME type and bitrate for smaller files
-                const options = { mimeType: 'audio/mp4', audioBitsPerSecond: 128000 };
+                // ลด Bitrate เพื่อให้ไฟล์เล็กลงมาก
+                const options = { mimeType: 'audio/mp4', audioBitsPerSecond: 64000 };
                 mediaRecorder = new MediaRecorder(stream, options);
 
                 audioChunks[index] = [];
@@ -332,7 +332,6 @@
                     audioEl.style.display = "block";
                     document.querySelector(`.play-btn[data-index="${index}"]`).disabled = false;
                     
-                    // Display file size
                     const fileSizeKB = (blob.size / 1024).toFixed(2);
                     document.getElementById(`fileSize${index}`).textContent = `ขนาดไฟล์: ${fileSizeKB} KB`;
                     
@@ -340,7 +339,6 @@
                 };
 
                 mediaRecorder.start();
-                // Update button states
                 document.querySelector(`.start-btn[data-index="${index}"]`).disabled = true;
                 document.querySelector(`.stop-btn[data-index="${index}"]`).disabled = false;
             } catch (err) {
@@ -353,7 +351,6 @@
         function stopRecording(index) {
             if (mediaRecorder && mediaRecorder.state !== "inactive") {
                 mediaRecorder.stop();
-                // Update button states
                 document.querySelector(`.start-btn[data-index="${index}"]`).disabled = false;
                 document.querySelector(`.stop-btn[data-index="${index}"]`).disabled = true;
             }
@@ -369,13 +366,12 @@
             }
         }
 
-        // Upload all files with progress
+        // Upload all files with progress and redirect
         async function uploadAll() {
             if (!currentUser) {
                 return showMessage("ไม่พบผู้ใช้ กรุณาลองเข้าสู่ระบบใหม่", "error");
             }
 
-            // Check if all questions have been recorded
             for (let i = 0; i < questions.length; i++) {
                 if (!audioChunks[i] || audioChunks[i].length === 0) {
                     showMessage(`กรุณาอัดเสียงคำตอบข้อ ${i+1} ก่อน`, "error");
@@ -420,9 +416,9 @@
                     });
                 }
 
-                showMessage("ส่งไฟล์เสียงทั้งหมดเรียบร้อยแล้ว!", "info");
+                showMessage("ส่งไฟล์เสียงทั้งหมดเรียบร้อยแล้ว! กำลังนำทาง...", "info");
                 setTimeout(() => {
-                    // Redirect or close the app
+                    window.location.href = "index5.html"; 
                 }, 2000);
             } catch (err) {
                 console.error('เกิดข้อผิดพลาดในการอัปโหลด', err);
@@ -436,7 +432,3 @@
     </script>
 </body>
 </html>
-
-
-
-
