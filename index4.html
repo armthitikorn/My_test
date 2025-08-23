@@ -1,451 +1,452 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แบบทดสอบเสียงพนักงานขายประกัน</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2vK/lV8f7xW3m5M1Zc6p9z2w1yT4fF/r5m1v3i4f8O/1Z+6h+5v+2/4g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <style>
-        body {
-            font-family: 'Tahoma', sans-serif;
-            background: #f0f2f5;
-            padding: 20px;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .container {
-            max-width: 800px;
-            width: 100%;
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #004085;
-            margin-bottom: 10px;
-        }
-        .user-info {
-            text-align: center;
-            font-size: 1.1em;
-            color: #555;
-            margin-bottom: 20px;
-        }
-        .question {
-            background: #f8f9fa;
-            border: 1px solid #e2e6ea;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .question p {
-            font-weight: bold;
-            color: #0056b3;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-        .control-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-        }
-        button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease, transform 0.2s;
-        }
-        button:hover {
-            transform: translateY(-2px);
-        }
-        button:active {
-            transform: translateY(0);
-        }
-        button:disabled {
-            background-color: #e0e0e0 !important;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .start-btn { background-color: #28a745; color: white; }
-        .stop-btn { background-color: #dc3545; color: white; }
-        .play-btn { background-color: #007bff; color: white; }
-        audio {
-            width: 100%;
-            margin-top: 15px;
-            display: none;
-        }
-        .submit-btn {
-            width: 100%;
-            padding: 15px;
-            margin-top: 30px;
-            background-color: #007bff;
-            color: white;
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-        .message-box {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #d1e7dd;
-            color: #0f5132;
-            border: 1px solid #badbcc;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            display: none;
-            z-index: 1000;
-        }
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-            flex-direction: column;
-            text-align: center;
-            font-size: 1.2em;
-            color: #555;
-            display: none;
-        }
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .upload-progress {
-            width: 100%;
-            height: 25px;
-            background-color: #e9ecef;
-            border-radius: 5px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-        .progress-bar {
-            height: 100%;
-            background-color: #007bff;
-            width: 0%;
-            transition: width 0.4s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 0.9em;
-        }
-        .file-size {
-            margin-top: 5px;
-            font-size: 0.9em;
-            color: #6c757d;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบเสียงพนักงานขายประกัน</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2vK/lV8f7xW3m5M1Zc6p9z2w1yT4fF/r5m1v3i4f8O/1Z+6h+5v+2/4g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #004085;
+            margin-bottom: 10px;
+        }
+        .user-info {
+            text-align: center;
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .question {
+            background: #f8f9fa;
+            border: 1px solid #e2e6ea;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .question p {
+            font-weight: bold;
+            color: #0056b3;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .control-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button:disabled {
+            background-color: #e0e0e0 !important;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .start-btn { background-color: #28a745; color: white; }
+        .stop-btn { background-color: #dc3545; color: white; }
+        .play-btn { background-color: #007bff; color: white; }
+        audio {
+            width: 100%;
+            margin-top: 15px;
+            display: none;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            margin-top: 30px;
+            background-color: #007bff;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #d1e7dd;
+            color: #0f5132;
+            border: 1px solid #badbcc;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            flex-direction: column;
+            text-align: center;
+            font-size: 1.2em;
+            color: #555;
+            display: none;
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .upload-progress {
+            width: 100%;
+            height: 25px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #007bff;
+            width: 0%;
+            transition: width 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .file-size {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+    </style>
 </head>
 <body>
-    <div id="messageBox" class="message-box"></div>
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="loading-spinner"></div>
-        <p id="loadingText">กำลังอัปโหลด... กรุณารอสักครู่</p>
-        <div class="upload-progress" style="width: 200px;">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-    </div>
+    <div id="messageBox" class="message-box"></div>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p id="loadingText">กำลังอัปโหลด... กรุณารอสักครู่</p>
+        <div class="upload-progress" style="width: 200px;">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
 
-    <div class="container">
-        <h1>🎤 แบบทดสอบเสียงสำหรับพนักงานขายประกัน</h1>
-        <div class="user-info"><b>ชื่อผู้ทำแบบทดสอบ:</b> <span id="userNameDisplay">กำลังโหลด...</span></div>
+    <div class="container">
+        <h1>🎤 แบบทดสอบเสียงสำหรับพนักงานขายประกัน</h1>
+        <div class="user-info"><b>ชื่อผู้ทำแบบทดสอบ:</b> <span id="userNameDisplay">กำลังโหลด...</span></div>
 
-        <div id="questions"></div>
+        <div id="questions"></div>
 
-        <button id="submitAllBtn" class="submit-btn">
-            <i class="fas fa-upload"></i> ส่งไฟล์เสียงทั้งหมด & ไปหน้าต่อไป
-        </button>
-    </div>
+        <button id="submitAllBtn" class="submit-btn">
+            <i class="fas fa-upload"></i> ส่งไฟล์เสียงทั้งหมด & ไปหน้าต่อไป
+        </button>
+    </div>
 
-    <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getAuth, signInWithCustomToken, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
-        
-        // This function displays a custom message box instead of the browser's native alert().
-        function showMessage(text, type = 'info') {
-            const messageBox = document.getElementById('messageBox');
-            messageBox.textContent = text;
-            messageBox.style.display = 'block';
-            if (type === 'error') {
-                messageBox.style.backgroundColor = '#f8d7da';
-                messageBox.style.color = '#721c24';
-                messageBox.style.borderColor = '#f5c6cb';
-            } else {
-                messageBox.style.backgroundColor = '#d1e7dd';
-                messageBox.style.color = '#0f5132';
-                messageBox.style.borderColor = '#badbcc';
-            }
-            setTimeout(() => {
-                messageBox.style.display = 'none';
-            }, 3000);
-        }
-        
-        // Firebase configuration. This should be a valid configuration for your project.
-        const firebaseConfig = {
-            apiKey: "AIzaSyA4OrZERUoxWPiShCEWVvz1MK9cYGO3_K8",
-            authDomain: "new-record-3ccd6.firebaseapp.com",
-            projectId: "new-record-3ccd6",
-            storageBucket: "new-record-3ccd6.appspot.com",
-            messagingSenderId: "1065863160189",
-            appId: "1:1065863160189:web:25313e55b0733f5e126c14",
-            measurementId: "G-JW6N2HYR58"
-        };
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getAuth, signInWithCustomToken, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+        
+        // This function displays a custom message box instead of the browser's native alert().
+        function showMessage(text, type = 'info') {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = text;
+            messageBox.style.display = 'block';
+            if (type === 'error') {
+                messageBox.style.backgroundColor = '#f8d7da';
+                messageBox.style.color = '#721c24';
+                messageBox.style.borderColor = '#f5c6cb';
+            } else {
+                messageBox.style.backgroundColor = '#d1e7dd';
+                messageBox.style.color = '#0f5132';
+                messageBox.style.borderColor = '#badbcc';
+            }
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Firebase configuration. This should be a valid configuration for your project.
+        const firebaseConfig = {
+            apiKey: "AIzaSyA4OrZERUoxWPiShCEWVvz1MK9cYGO3_K8",
+            authDomain: "new-record-3ccd6.firebaseapp.com",
+            projectId: "new-record-3ccd6",
+            storageBucket: "new-record-3ccd6.appspot.com",
+            messagingSenderId: "1065863160189",
+            appId: "1:1065863160189:web:25313e55b0733f5e126c14",
+            measurementId: "G-JW6N2HYR58"
+        };
 
-        let app, storage, db, auth;
-        let currentUser = null;
+        let app, storage, db, auth;
+        let currentUser = null;
 
-        // Initialize Firebase on window load and set up authentication
-        window.onload = () => {
-            if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("YOUR_API_KEY")) {
-                showMessage("เกิดข้อผิดพลาด: API Key ไม่ถูกต้อง โปรดตรวจสอบการตั้งค่า Firebase", "error");
-                console.error("Firebase Initialization Error: API Key is not valid.");
-                return;
-            }
+        // Initialize Firebase on window load and set up authentication
+        window.onload = () => {
+            if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("YOUR_API_KEY")) {
+                showMessage("เกิดข้อผิดพลาด: API Key ไม่ถูกต้อง โปรดตรวจสอบการตั้งค่า Firebase", "error");
+                console.error("Firebase Initialization Error: API Key is not valid.");
+                return;
+            }
 
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            storage = getStorage(app);
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            storage = getStorage(app);
 
-            // Listen for changes in the user's authentication state
-            onAuthStateChanged(auth, user => {
-                if (!user) {
-                    // Redirect to index5.html if the user is not authenticated
-                    showMessage("กรุณาเข้าสู่ระบบก่อน", "error");
-                    setTimeout(() => {
-                        window.location.href = "index5.html";
-                    }, 2000);
-                } else {
-                    currentUser = user;
-                    document.getElementById("userNameDisplay").textContent = user.email || "ผู้ใช้งานนิรนาม";
-                }
-            });
-        };
+            // Listen for changes in the user's authentication state
+            onAuthStateChanged(auth, user => {
+                if (!user) {
+                    // Redirect to index5.html if the user is not authenticated
+                    showMessage("กรุณาเข้าสู่ระบบก่อน", "error");
+                    setTimeout(() => {
+                        window.location.href = "index5.html";
+                    }, 2000);
+                } else {
+                    currentUser = user;
+                    document.getElementById("userNameDisplay").textContent = user.email || "ผู้ใช้งานนิรนาม";
+                }
+            });
+        };
 
-        const questions = [
-            "ขอบคุณครับ แต่ตอนนี้ยังไม่สนใจประกัน",
-            "ขอเวลาตัดสินใจก่อนครับ",
-            "ประกันมันซับซ้อนเกินไป",
-            "ตอนนี้ยังไม่พร้อมทางการเงิน",
-            "ขอคุยกับครอบครัวก่อน",
-            "ผมมีประกันอยู่หลายเล่มแล้ว",
-            "กลัวว่าผ่อนส่งไม่ไหว",
-            "ยังไม่เชื่อมั่นในบริษัท",
-            "ขอดูข้อมูลละเอียดกว่านี้",
-            "ตอนนี้มีภาระหนี้สินอยู่",
-            "ผมกำลังศึกษาอยู่หลายที่",
-            "ผมต้องการเปรียบเทียบก่อน",
-            "ขอเวลาคิดทบทวนอีกหน่อย",
-            "ยังไม่แน่ใจว่าเหมาะกับตัวเอง",
-            "ผมมีญาติทำประกันอยู่แล้ว",
-            "กลัวว่าสัญญาจะไม่คุ้มค่า",
-            "ยังไม่เข้าใจเรื่องเงื่อนไขมากพอ",
-            "อยากได้แบบที่ถูกกว่านี้",
-            "ขอให้ติดต่อกลับมาใหม่ทีหลัง",
-            "ตอนนี้ยังไม่อยากตัดสินใจ"
-        ];
+        const questions = [
+            "ขอบคุณครับ แต่ตอนนี้ยังไม่สนใจประกัน",
+            "ขอเวลาตัดสินใจก่อนครับ",
+            "ประกันมันซับซ้อนเกินไป",
+            "ตอนนี้ยังไม่พร้อมทางการเงิน",
+            "ขอคุยกับครอบครัวก่อน",
+            "ผมมีประกันอยู่หลายเล่มแล้ว",
+            "กลัวว่าผ่อนส่งไม่ไหว",
+            "ยังไม่เชื่อมั่นในบริษัท",
+            "ขอดูข้อมูลละเอียดกว่านี้",
+            "ตอนนี้มีภาระหนี้สินอยู่",
+            "ผมกำลังศึกษาอยู่หลายที่",
+            "ผมต้องการเปรียบเทียบก่อน",
+            "ขอเวลาคิดทบทวนอีกหน่อย",
+            "ยังไม่แน่ใจว่าเหมาะกับตัวเอง",
+            "ผมมีญาติทำประกันอยู่แล้ว",
+            "กลัวว่าสัญญาจะไม่คุ้มค่า",
+            "ยังไม่เข้าใจเรื่องเงื่อนไขมากพอ",
+            "อยากได้แบบที่ถูกกว่านี้",
+            "ขอให้ติดต่อกลับมาใหม่ทีหลัง",
+            "ตอนนี้ยังไม่อยากตัดสินใจ"
+        ];
 
-        const container = document.getElementById("questions");
-        let audioChunks = {}; // Object to hold audio data for each question
-        let mediaRecorder;
+        const container = document.getElementById("questions");
+        let audioChunks = {}; // Object to hold audio data for each question
+        let mediaRecorder;
 
-        // Create question elements dynamically
-        questions.forEach((q, i) => {
-            const div = document.createElement("div");
-            div.className = "question";
-            div.innerHTML = `
-                <p><b>${i+1}. ${q}</b></p>
-                <div class="control-buttons">
-                    <button class="start-btn" data-index="${i}">
-                        <i class="fas fa-microphone"></i> เริ่มอัดเสียง
-                    </button>
-                    <button class="stop-btn" data-index="${i}" disabled>
-                        <i class="fas fa-stop-circle"></i> หยุดอัดเสียง
-                    </button>
-                    <button class="play-btn" data-index="${i}" disabled>
-                        <i class="fas fa-play-circle"></i> ฟังเสียง
-                    </button>
-                    <audio id="audio${i}" controls style="display:none;"></audio>
-                    <span class="file-size" id="fileSize${i}"></span>
-                </div>
-            `;
-            container.appendChild(div);
-        });
+        // Create question elements dynamically
+        questions.forEach((q, i) => {
+            const div = document.createElement("div");
+            div.className = "question";
+            div.innerHTML = `
+                <p><b>${i+1}. ${q}</b></p>
+                <div class="control-buttons">
+                    <button class="start-btn" data-index="${i}">
+                        <i class="fas fa-microphone"></i> เริ่มอัดเสียง
+                    </button>
+                    <button class="stop-btn" data-index="${i}" disabled>
+                        <i class="fas fa-stop-circle"></i> หยุดอัดเสียง
+                    </button>
+                    <button class="play-btn" data-index="${i}" disabled>
+                        <i class="fas fa-play-circle"></i> ฟังเสียง
+                    </button>
+                    <audio id="audio${i}" controls style="display:none;"></audio>
+                    <span class="file-size" id="fileSize${i}"></span>
+                </div>
+            `;
+            container.appendChild(div);
+        });
 
-        // Event listeners for buttons
-        document.addEventListener('click', e => {
-            const target = e.target.closest('button');
-            if (!target) return;
-            const index = target.getAttribute('data-index');
+        // Event listeners for buttons
+        document.addEventListener('click', e => {
+            const target = e.target.closest('button');
+            if (!target) return;
+            const index = target.getAttribute('data-index');
 
-            if (target.classList.contains('start-btn')) {
-                startRecording(index);
-            } else if (target.classList.contains('stop-btn')) {
-                stopRecording(index);
-            } else if (target.classList.contains('play-btn')) {
-                playRecording(index);
-            }
-        });
+            if (target.classList.contains('start-btn')) {
+                startRecording(index);
+            } else if (target.classList.contains('stop-btn')) {
+                stopRecording(index);
+            } else if (target.classList.contains('play-btn')) {
+                playRecording(index);
+            }
+        });
 
-        // Start recording function using MediaRecorder API
-        async function startRecording(index) {
-            if (!navigator.mediaDevices) {
-                showMessage("เบราว์เซอร์นี้ไม่รองรับการอัดเสียง", "error");
-                return;
-            }
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                // ใช้ค่า audioBitsPerSecond ที่ต่ำลงเพื่อลดขนาดไฟล์เสียงให้น้อยที่สุด
-                const options = { mimeType: 'audio/mp4', audioBitsPerSecond: 16000 };
-                mediaRecorder = new MediaRecorder(stream, options);
+        // Start recording function using MediaRecorder API
+        async function startRecording(index) {
+            if (!navigator.mediaDevices) {
+                showMessage("เบราว์เซอร์นี้ไม่รองรับการอัดเสียง", "error");
+                return;
+            }
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                // ใช้ค่า audioBitsPerSecond ที่ต่ำลงเพื่อลดขนาดไฟล์เสียงให้น้อยที่สุด
+                const options = { mimeType: 'audio/mp4', audioBitsPerSecond: 16000 };
+                mediaRecorder = new MediaRecorder(stream, options);
 
-                audioChunks[index] = [];
-                mediaRecorder.ondataavailable = e => { 
-                    if(e.data.size > 0) {
-                        audioChunks[index].push(e.data);
-                    }
-                };
-                mediaRecorder.onstop = () => {
-                    const blob = new Blob(audioChunks[index], { type: 'audio/mp4' });
-                    const url = URL.createObjectURL(blob);
-                    const audioEl = document.getElementById("audio" + index);
-                    audioEl.src = url;
-                    audioEl.style.display = "block";
-                    document.querySelector(`.play-btn[data-index="${index}"]`).disabled = false;
-                    
-                    // Display file size
-                    const fileSizeKB = (blob.size / 1024).toFixed(2);
-                    document.getElementById(`fileSize${index}`).textContent = `ขนาดไฟล์: ${fileSizeKB} KB`;
-                    
-                    showMessage("บันทึกเสียงเรียบร้อยแล้ว", "info");
-                };
+                audioChunks[index] = [];
+                mediaRecorder.ondataavailable = e => { 
+                    if(e.data.size > 0) {
+                        audioChunks[index].push(e.data);
+                    }
+                };
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(audioChunks[index], { type: 'audio/mp4' });
+                    const url = URL.createObjectURL(blob);
+                    const audioEl = document.getElementById("audio" + index);
+                    audioEl.src = url;
+                    audioEl.style.display = "block";
+                    document.querySelector(`.play-btn[data-index="${index}"]`).disabled = false;
+                    
+                    // Display file size
+                    const fileSizeKB = (blob.size / 1024).toFixed(2);
+                    document.getElementById(`fileSize${index}`).textContent = `ขนาดไฟล์: ${fileSizeKB} KB`;
+                    
+                    showMessage("บันทึกเสียงเรียบร้อยแล้ว", "info");
+                };
 
-                mediaRecorder.start();
-                // Update button states
-                document.querySelector(`.start-btn[data-index="${index}"]`).disabled = true;
-                document.querySelector(`.stop-btn[data-index="${index}"]`).disabled = false;
-            } catch (err) {
-                console.error("Media recording error:", err);
-                showMessage("ไม่สามารถเข้าถึงไมโครโฟนได้ กรุณาตรวจสอบสิทธิ์", "error");
-            }
-        }
+                mediaRecorder.start();
+                // Update button states
+                document.querySelector(`.start-btn[data-index="${index}"]`).disabled = true;
+                document.querySelector(`.stop-btn[data-index="${index}"]`).disabled = true;
+            } catch (err) {
+                console.error("Media recording error:", err);
+                showMessage("ไม่สามารถเข้าถึงไมโครโฟนได้ กรุณาตรวจสอบสิทธิ์", "error");
+            }
+        }
 
-        // Stop recording function
-        function stopRecording(index) {
-            if (mediaRecorder && mediaRecorder.state !== "inactive") {
-                mediaRecorder.stop();
-                // Update button states
-                document.querySelector(`.start-btn[data-index="${index}"]`).disabled = false;
-                document.querySelector(`.stop-btn[data-index="${index}"]`).disabled = true;
-            }
-        }
+        // Stop recording function
+        function stopRecording(index) {
+            if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+                // Update button states
+                document.querySelector(`.start-btn[data-index="${index}"]`).disabled = false;
+                document.querySelector(`.stop-btn[data-index="${index}"]`).disabled = true;
+            }
+        }
 
-        // Play recorded audio
-        function playRecording(index) {
-            const audioEl = document.getElementById("audio" + index);
-            if (audioEl.src) {
-                audioEl.play();
-            } else {
-                showMessage("ไม่มีไฟล์เสียงให้เล่น", "error");
-            }
-        }
+        // Play recorded audio
+        function playRecording(index) {
+            const audioEl = document.getElementById("audio" + index);
+            if (audioEl.src) {
+                audioEl.play();
+            } else {
+                showMessage("ไม่มีไฟล์เสียงให้เล่น", "error");
+            }
+        }
 
-        // Upload all recorded files with a progress indicator
-        async function uploadAll() {
-            if (!currentUser) {
-                return showMessage("ไม่พบผู้ใช้ กรุณาลองเข้าสู่ระบบใหม่", "error");
-            }
+        // Upload all recorded files with a progress indicator
+        async function uploadAll() {
+            if (!currentUser) {
+                return showMessage("ไม่พบผู้ใช้ กรุณาลองเข้าสู่ระบบใหม่", "error");
+            }
 
-            // Check if all questions have been recorded
-            for (let i = 0; i < questions.length; i++) {
-                if (!audioChunks[i] || audioChunks[i].length === 0) {
-                    showMessage(`กรุณาอัดเสียงคำตอบข้อ ${i+1} ก่อน`, "error");
-                    return;
-                }
-            }
+            // Check if all questions have been recorded
+            const allRecorded = questions.every((_, i) => audioChunks[i] && audioChunks[i].length > 0);
+            if (!allRecorded) {
+                return showMessage("กรุณาอัดเสียงให้ครบทุกข้อก่อน", "error");
+            }
 
-            const loadingOverlay = document.getElementById("loadingOverlay");
-            const loadingText = document.getElementById("loadingText");
-            const progressBar = document.getElementById("progressBar");
-            loadingOverlay.style.display = "flex";
+            const loadingOverlay = document.getElementById("loadingOverlay");
+            const loadingText = document.getElementById("loadingText");
+            const progressBar = document.getElementById("progressBar");
+            loadingOverlay.style.display = "flex";
 
-            try {
-                for (let i = 0; i < questions.length; i++) {
-                    const blob = new Blob(audioChunks[i], { type: 'audio/mp4' });
-                    const fileName = `${currentUser.uid}_answer${i+1}.mp4`;
-                    const storageRef = ref(storage, `audios/${currentUser.uid}/${fileName}`);
-                    const uploadTask = uploadBytesResumable(storageRef, blob);
+            try {
+                const uploadPromises = questions.map((_, i) => {
+                    const blob = new Blob(audioChunks[i], { type: 'audio/mp4' });
+                    const fileName = `${currentUser.uid}_answer${i+1}.mp4`;
+                    const storageRef = ref(storage, `audios/${currentUser.uid}/${fileName}`);
+                    const uploadTask = uploadBytesResumable(storageRef, blob);
+                    
+                    // We can add a listener for each upload to get progress
+                    uploadTask.on('state_changed', (snapshot) => {
+                        // This shows individual file progress, which can be confusing.
+                        // It's better to calculate overall progress as shown below.
+                    });
+                    
+                    return uploadTask;
+                });
+                
+                // Wait for all uploads to complete
+                const snapshots = await Promise.all(uploadPromises);
 
-                    uploadTask.on('state_changed', 
-                        (snapshot) => {
-                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                            loadingText.textContent = `กำลังอัปโหลดไฟล์ที่ ${i+1} (${Math.round(progress)}%)`;
-                            progressBar.style.width = progress + '%';
-                            progressBar.textContent = `${Math.round(progress)}%`;
-                        }, 
-                        (error) => {
-                            console.error('Upload error:', error);
-                            throw error;
-                        }
-                    );
+                // Get all download URLs and save to Firestore
+                const firestorePromises = snapshots.map(async (snapshot) => {
+                    const url = await getDownloadURL(snapshot.ref);
+                    const questionIndex = parseInt(snapshot.ref.name.match(/answer(\d+)/)[1]) - 1;
+                    return addDoc(collection(db, 'submissions'), {
+                        uid: currentUser.uid,
+                        email: currentUser.email || 'anonymous',
+                        question: questionIndex + 1,
+                        audioUrl: url,
+                        timestamp: new Date()
+                    });
+                });
 
-                    await uploadTask;
-                    const url = await getDownloadURL(storageRef);
+                // Wait for all Firestore writes to complete
+                await Promise.all(firestorePromises);
 
-                    // Save submission data to Firestore
-                    await addDoc(collection(db, 'submissions'), {
-                        uid: currentUser.uid,
-                        email: currentUser.email || 'anonymous',
-                        question: i+1,
-                        audioUrl: url,
-                        timestamp: new Date()
-                    });
-                }
+                showMessage("ส่งไฟล์เสียงทั้งหมดเรียบร้อยแล้ว!", "info");
+                // Redirect to index5.html after successful upload
+                setTimeout(() => {
+                    window.location.href = "index5.html";
+                }, 2000);
+            } catch (err) {
+                console.error('เกิดข้อผิดพลาดในการอัปโหลด', err);
+                showMessage("เกิดข้อผิดพลาดในการส่งไฟล์เสียง", "error");
+            } finally {
+                loadingOverlay.style.display = "none";
+            }
+        }
 
-                showMessage("ส่งไฟล์เสียงทั้งหมดเรียบร้อยแล้ว!", "info");
-                // Redirect to index5.html after successful upload
-                setTimeout(() => {
-                    window.location.href = "index5.html";
-                }, 2000);
-            } catch (err) {
-                console.error('เกิดข้อผิดพลาดในการอัปโหลด', err);
-                showMessage("เกิดข้อผิดพลาดในการส่งไฟล์เสียง", "error");
-            } finally {
-                loadingOverlay.style.display = "none";
-            }
-        }
-
-        document.getElementById('submitAllBtn').addEventListener('click', uploadAll);
-    </script>
+        document.getElementById('submitAllBtn').addEventListener('click', uploadAll);
+    </script>
 </body>
 </html>
+
 
 
 
