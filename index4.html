@@ -6,10 +6,10 @@
     <title>แบบทดสอบเสียงพนักงานขายประกัน</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2vK/lV8f7xW3m5M1Zc6p9z2w1yT4fF/r5m1v3i4f8O/1Z+6h+5v+2/4g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        body { 
-            font-family: 'Tahoma', sans-serif; 
-            background: #f0f2f5; 
-            padding: 20px; 
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
             color: #333;
             display: flex;
             flex-direction: column;
@@ -23,8 +23,8 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        h1 { 
-            text-align: center; 
+        h1 {
+            text-align: center;
             color: #004085;
             margin-bottom: 10px;
         }
@@ -159,17 +159,31 @@
             color: #6c757d;
         }
     </style>
+</head>
+<body>
+    <div id="messageBox" class="message-box"></div>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p id="loadingText">กำลังอัปโหลด...</p>
+        <div class="upload-progress">
+            <div id="progressBar" class="progress-bar">0%</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>แบบทดสอบเสียงพนักงานขายประกัน</h1>
+        <p class="user-info">ผู้ใช้งาน: <span id="userNameDisplay"></span></p>
+        <div id="questions"></div>
+        <button id="submitAllBtn" class="submit-btn">ส่งคำตอบทั้งหมด</button>
+    </div>
 
     <script type="module">
-        // นำเข้าโมดูลที่จำเป็นจาก Firebase SDK
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-        import { ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 
-        // นำเข้าตัวแปร storage และ db จากไฟล์ firebase.js ที่คุณสร้างขึ้น
-        import { storage, db } from "./firebase.js"; // *** จุดสำคัญที่ต้องแก้ไข
-
-        // ฟังก์ชันสำหรับแสดงข้อความแจ้งเตือนแทน alert()
+        // Show a custom message box instead of alert()
         function showMessage(text, type = 'info') {
             const messageBox = document.getElementById('messageBox');
             messageBox.textContent = text;
@@ -185,11 +199,49 @@
             }
             setTimeout(() => {
                 messageBox.style.display = 'none';
-            }, 3000); // ซ่อนกล่องข้อความหลังจาก 3 วินาที
+            }, 3000);
         }
-        
-        // Firebase Auth
-        const auth = getAuth();
+
+        // Firebase configuration (replace with your own)
+        const firebaseConfig = {
+            apiKey: "AIzaSyA4OrZERUoxWPiShCEWVvz1MK9cYGO3_K8",
+            authDomain: "new-record-3ccd6.firebaseapp.com",
+            projectId: "new-record-3ccd6",
+            storageBucket: "new-record-3ccd6.appspot.com",
+            messagingSenderId: "1065863160189",
+            appId: "1:1065863160189:web:25313e55b0733f5e126c14",
+            measurementId: "G-JW6N2HYR58"
+        };
+
+        let app, storage, db, auth;
+        let currentUser = null;
+
+        // Initialize Firebase after the document is loaded
+        window.onload = () => {
+            if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("YOUR_API_KEY")) {
+                showMessage("เกิดข้อผิดพลาด: API Key ไม่ถูกต้อง โปรดตรวจสอบการตั้งค่า Firebase", "error");
+                console.error("Firebase Initialization Error: API Key is not valid.");
+                return;
+            }
+
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            storage = getStorage(app);
+            
+            // Check auth state and redirect if not logged in
+            onAuthStateChanged(auth, user => {
+                if (!user) {
+                    showMessage("กรุณาเข้าสู่ระบบก่อน", "error");
+                    setTimeout(() => {
+                        window.location.href = "index.html";
+                    }, 2000);
+                } else {
+                    currentUser = user;
+                    document.getElementById("userNameDisplay").textContent = user.email || "ผู้ใช้งานนิรนาม";
+                }
+            });
+        };
 
         const questions = [
             "ขอบคุณครับ แต่ตอนนี้ยังไม่สนใจประกัน",
@@ -215,10 +267,9 @@
         ];
 
         const container = document.getElementById("questions");
-        let audioChunks = {}; // Object to hold audio data for each question
+        let audioChunks = {};
         let mediaRecorder;
 
-        // Create questions dynamically
         questions.forEach((q, i) => {
             const div = document.createElement("div");
             div.className = "question";
@@ -241,28 +292,11 @@
             container.appendChild(div);
         });
 
-        // User authentication check
-        let currentUser = null;
-        onAuthStateChanged(auth, user => {
-            if (!user) {
-                signInAnonymously(auth).then(cred => {
-                    currentUser = cred.user;
-                    document.getElementById("userNameDisplay").textContent = "ผู้ใช้งานนิรนาม";
-                }).catch(err => {
-                    console.error("Anonymous auth failed", err);
-                    showMessage("เกิดข้อผิดพลาดในการเข้าสู่ระบบ", "error");
-                });
-            } else {
-                currentUser = user;
-                document.getElementById("userNameDisplay").textContent = user.email || "ผู้ใช้งานนิรนาม";
-            }
-        });
-
-        // Event listeners for buttons
         document.addEventListener('click', e => {
             const target = e.target.closest('button');
             if (!target) return;
             const index = target.getAttribute('data-index');
+
             if (target.classList.contains('start-btn')) {
                 startRecording(index);
             } else if (target.classList.contains('stop-btn')) {
@@ -272,7 +306,6 @@
             }
         });
 
-        // Start recording function
         async function startRecording(index) {
             if (!navigator.mediaDevices) {
                 showMessage("เบราว์เซอร์นี้ไม่รองรับการอัดเสียง", "error");
@@ -280,7 +313,6 @@
             }
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                // ลด Bitrate เพื่อให้ไฟล์เล็กลงมาก
                 const options = { mimeType: 'audio/mp4', audioBitsPerSecond: 64000 };
                 mediaRecorder = new MediaRecorder(stream, options);
 
@@ -313,7 +345,6 @@
             }
         }
 
-        // Stop recording function
         function stopRecording(index) {
             if (mediaRecorder && mediaRecorder.state !== "inactive") {
                 mediaRecorder.stop();
@@ -322,7 +353,6 @@
             }
         }
 
-        // Play recorded audio
         function playRecording(index) {
             const audioEl = document.getElementById("audio" + index);
             if (audioEl.src) {
@@ -332,7 +362,6 @@
             }
         }
 
-        // Upload all files with progress and redirect
         async function uploadAll() {
             if (!currentUser) {
                 return showMessage("ไม่พบผู้ใช้ กรุณาลองเข้าสู่ระบบใหม่", "error");
@@ -382,10 +411,7 @@
                     });
                 }
 
-                showMessage("ส่งไฟล์เสียงทั้งหมดเรียบร้อยแล้ว! กำลังนำทาง...", "info");
-                setTimeout(() => {
-                    window.location.href = "index5.html"; 
-                }, 2000);
+                showMessage("ส่งไฟล์เสียงทั้งหมดเรียบร้อยแล้ว!", "info");
             } catch (err) {
                 console.error('เกิดข้อผิดพลาดในการอัปโหลด', err);
                 showMessage("เกิดข้อผิดพลาดในการส่งไฟล์เสียง", "error");
@@ -398,4 +424,5 @@
     </script>
 </body>
 </html>
+
 
