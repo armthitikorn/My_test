@@ -160,35 +160,15 @@
         }
     </style>
 
-    <!-- Firebase SDK v9 compat -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-</head>
-<body>
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-        <p id="loadingText">กำลังอัปโหลด... กรุณารอสักครู่</p>
-        <div class="upload-progress" style="width: 200px;">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-    </div>
+    <script type="module">
+        // นำเข้าโมดูลที่จำเป็นจาก Firebase SDK
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 
-    <div class="container">
-        <h1>🎤 แบบทดสอบเสียงสำหรับพนักงานขายประกัน</h1>
-        <div class="user-info"><b>ชื่อผู้ทำแบบทดสอบ:</b> <span id="userNameDisplay">กำลังโหลด...</span></div>
+        // นำเข้าตัวแปร storage และ db จากไฟล์ firebase.js ที่คุณสร้างขึ้น
+        import { storage, db } from "./firebase.js"; // *** จุดสำคัญที่ต้องแก้ไข
 
-        <div id="questions"></div>
-
-        <button id="submitAllBtn" class="submit-btn">
-            <i class="fas fa-upload"></i> ส่งไฟล์เสียงทั้งหมด & ไปหน้าต่อไป
-        </button>
-    </div>
-
-    <div class="message-box" id="messageBox"></div>
-
-    <script>
         // ฟังก์ชันสำหรับแสดงข้อความแจ้งเตือนแทน alert()
         function showMessage(text, type = 'info') {
             const messageBox = document.getElementById('messageBox');
@@ -208,22 +188,8 @@
             }, 3000); // ซ่อนกล่องข้อความหลังจาก 3 วินาที
         }
         
-        // Firebase Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyA4OrZERUoxWPiShCEWVvz1MK9cYGO3_K8",
-            authDomain: "new-record-3ccd6.firebaseapp.com",
-            projectId: "new-record-3ccd6",
-            storageBucket: "new-record-3ccd6.appspot.com",
-            messagingSenderId: "1065863160189",
-            appId: "1:1065863160189:web:25313e55b0733f5e126c14",
-            measurementId: "G-JW6N2HYR58"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const storage = firebase.storage();
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+        // Firebase Auth
+        const auth = getAuth();
 
         const questions = [
             "ขอบคุณครับ แต่ตอนนี้ยังไม่สนใจประกัน",
@@ -277,9 +243,9 @@
 
         // User authentication check
         let currentUser = null;
-        auth.onAuthStateChanged(user => {
+        onAuthStateChanged(auth, user => {
             if (!user) {
-                auth.signInAnonymously().then(cred => {
+                signInAnonymously(auth).then(cred => {
                     currentUser = cred.user;
                     document.getElementById("userNameDisplay").textContent = "ผู้ใช้งานนิรนาม";
                 }).catch(err => {
@@ -388,8 +354,8 @@
                 for (let i = 0; i < questions.length; i++) {
                     const blob = new Blob(audioChunks[i], { type: 'audio/mp4' });
                     const fileName = `${currentUser.uid}_answer${i+1}.mp4`;
-                    const storageRef = storage.ref(`audios/${currentUser.uid}/${fileName}`);
-                    const uploadTask = storageRef.put(blob);
+                    const storageRef = ref(storage, `audios/${currentUser.uid}/${fileName}`);
+                    const uploadTask = uploadBytesResumable(storageRef, blob);
 
                     uploadTask.on('state_changed', 
                         (snapshot) => {
@@ -405,9 +371,9 @@
                     );
 
                     await uploadTask;
-                    const url = await storageRef.getDownloadURL();
+                    const url = await getDownloadURL(storageRef);
 
-                    await db.collection('submissions').add({
+                    await addDoc(collection(db, 'submissions'), {
                         uid: currentUser.uid,
                         email: currentUser.email || 'anonymous',
                         question: i+1,
@@ -432,3 +398,4 @@
     </script>
 </body>
 </html>
+
