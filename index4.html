@@ -164,26 +164,31 @@
     <div id="messageBox" class="message-box"></div>
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-spinner"></div>
-        <p id="loadingText">กำลังอัปโหลด...</p>
-        <div class="upload-progress">
-            <div id="progressBar" class="progress-bar">0%</div>
+        <p id="loadingText">กำลังอัปโหลด... กรุณารอสักครู่</p>
+        <div class="upload-progress" style="width: 200px;">
+            <div class="progress-bar" id="progressBar"></div>
         </div>
     </div>
 
     <div class="container">
-        <h1>แบบทดสอบเสียงพนักงานขายประกัน</h1>
-        <p class="user-info">ผู้ใช้งาน: <span id="userNameDisplay"></span></p>
+        <h1>🎤 แบบทดสอบเสียงสำหรับพนักงานขายประกัน</h1>
+        <div class="user-info"><b>ชื่อผู้ทำแบบทดสอบ:</b> <span id="userNameDisplay">กำลังโหลด...</span></div>
+
         <div id="questions"></div>
-        <button id="submitAllBtn" class="submit-btn">ส่งคำตอบทั้งหมด</button>
+
+        <button id="submitAllBtn" class="submit-btn">
+            <i class="fas fa-upload"></i> ส่งไฟล์เสียงทั้งหมด & ไปหน้าต่อไป
+        </button>
     </div>
 
     <script type="module">
+        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getAuth, signInWithCustomToken, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
-
-        // Show a custom message box instead of alert()
+        
+        // This function displays a custom message box instead of the browser's native alert().
         function showMessage(text, type = 'info') {
             const messageBox = document.getElementById('messageBox');
             messageBox.textContent = text;
@@ -201,8 +206,8 @@
                 messageBox.style.display = 'none';
             }, 3000);
         }
-
-        // Firebase configuration (replace with your own)
+        
+        // Firebase configuration. This should be a valid configuration for your project.
         const firebaseConfig = {
             apiKey: "AIzaSyA4OrZERUoxWPiShCEWVvz1MK9cYGO3_K8",
             authDomain: "new-record-3ccd6.firebaseapp.com",
@@ -216,7 +221,7 @@
         let app, storage, db, auth;
         let currentUser = null;
 
-        // Initialize Firebase after the document is loaded
+        // Initialize Firebase on window load and set up authentication
         window.onload = () => {
             if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("YOUR_API_KEY")) {
                 showMessage("เกิดข้อผิดพลาด: API Key ไม่ถูกต้อง โปรดตรวจสอบการตั้งค่า Firebase", "error");
@@ -228,13 +233,14 @@
             auth = getAuth(app);
             db = getFirestore(app);
             storage = getStorage(app);
-            
-            // Check auth state and redirect if not logged in
+
+            // Listen for changes in the user's authentication state
             onAuthStateChanged(auth, user => {
                 if (!user) {
+                    // Redirect to index5.html if the user is not authenticated
                     showMessage("กรุณาเข้าสู่ระบบก่อน", "error");
                     setTimeout(() => {
-                        window.location.href = "index.html";
+                        window.location.href = "index5.html";
                     }, 2000);
                 } else {
                     currentUser = user;
@@ -267,9 +273,10 @@
         ];
 
         const container = document.getElementById("questions");
-        let audioChunks = {};
+        let audioChunks = {}; // Object to hold audio data for each question
         let mediaRecorder;
 
+        // Create question elements dynamically
         questions.forEach((q, i) => {
             const div = document.createElement("div");
             div.className = "question";
@@ -292,6 +299,7 @@
             container.appendChild(div);
         });
 
+        // Event listeners for buttons
         document.addEventListener('click', e => {
             const target = e.target.closest('button');
             if (!target) return;
@@ -306,6 +314,7 @@
             }
         });
 
+        // Start recording function using MediaRecorder API
         async function startRecording(index) {
             if (!navigator.mediaDevices) {
                 showMessage("เบราว์เซอร์นี้ไม่รองรับการอัดเสียง", "error");
@@ -313,7 +322,8 @@
             }
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                const options = { mimeType: 'audio/mp4', audioBitsPerSecond: 64000 };
+                // ใช้ค่า audioBitsPerSecond ที่ต่ำลงเพื่อลดขนาดไฟล์เสียงให้น้อยที่สุด
+                const options = { mimeType: 'audio/mp4', audioBitsPerSecond: 16000 };
                 mediaRecorder = new MediaRecorder(stream, options);
 
                 audioChunks[index] = [];
@@ -330,6 +340,7 @@
                     audioEl.style.display = "block";
                     document.querySelector(`.play-btn[data-index="${index}"]`).disabled = false;
                     
+                    // Display file size
                     const fileSizeKB = (blob.size / 1024).toFixed(2);
                     document.getElementById(`fileSize${index}`).textContent = `ขนาดไฟล์: ${fileSizeKB} KB`;
                     
@@ -337,6 +348,7 @@
                 };
 
                 mediaRecorder.start();
+                // Update button states
                 document.querySelector(`.start-btn[data-index="${index}"]`).disabled = true;
                 document.querySelector(`.stop-btn[data-index="${index}"]`).disabled = false;
             } catch (err) {
@@ -345,14 +357,17 @@
             }
         }
 
+        // Stop recording function
         function stopRecording(index) {
             if (mediaRecorder && mediaRecorder.state !== "inactive") {
                 mediaRecorder.stop();
+                // Update button states
                 document.querySelector(`.start-btn[data-index="${index}"]`).disabled = false;
                 document.querySelector(`.stop-btn[data-index="${index}"]`).disabled = true;
             }
         }
 
+        // Play recorded audio
         function playRecording(index) {
             const audioEl = document.getElementById("audio" + index);
             if (audioEl.src) {
@@ -362,11 +377,13 @@
             }
         }
 
+        // Upload all recorded files with a progress indicator
         async function uploadAll() {
             if (!currentUser) {
                 return showMessage("ไม่พบผู้ใช้ กรุณาลองเข้าสู่ระบบใหม่", "error");
             }
 
+            // Check if all questions have been recorded
             for (let i = 0; i < questions.length; i++) {
                 if (!audioChunks[i] || audioChunks[i].length === 0) {
                     showMessage(`กรุณาอัดเสียงคำตอบข้อ ${i+1} ก่อน`, "error");
@@ -402,6 +419,7 @@
                     await uploadTask;
                     const url = await getDownloadURL(storageRef);
 
+                    // Save submission data to Firestore
                     await addDoc(collection(db, 'submissions'), {
                         uid: currentUser.uid,
                         email: currentUser.email || 'anonymous',
@@ -412,6 +430,10 @@
                 }
 
                 showMessage("ส่งไฟล์เสียงทั้งหมดเรียบร้อยแล้ว!", "info");
+                // Redirect to index5.html after successful upload
+                setTimeout(() => {
+                    window.location.href = "index5.html";
+                }, 2000);
             } catch (err) {
                 console.error('เกิดข้อผิดพลาดในการอัปโหลด', err);
                 showMessage("เกิดข้อผิดพลาดในการส่งไฟล์เสียง", "error");
@@ -424,5 +446,6 @@
     </script>
 </body>
 </html>
+
 
 
