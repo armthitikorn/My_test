@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เข้าสู่ระบบ / ลงทะเบียน</title>
+<style>
+  body { font-family: Tahoma, sans-serif; max-width: 500px; margin: auto; padding: 30px; background: #f7f9fc; }
+  input, button { display: block; width: 100%; margin: 10px 0; padding: 10px; }
+</style>
+</head>
+<body>
+
+<h2>ลงทะเบียน</h2>
+<input type="email" id="registerEmail" placeholder="Email">
+<input type="password" id="registerPassword" placeholder="Password">
+<button id="registerBtn">ลงทะเบียน</button>
+
+<h2>เข้าสู่ระบบ</h2>
+<input type="email" id="loginEmail" placeholder="Email">
+<input type="password" id="loginPassword" placeholder="Password">
+<button id="loginBtn">เข้าสู่ระบบ</button>
+
+<script type="module">
+  // Import Firebase SDK
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
+
+  // Firebase config (เปลี่ยนเป็นของคุณเอง)
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // ลงทะเบียน
+  document.getElementById('registerBtn').addEventListener('click', () => {
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(userCredential => {
+        alert("ลงทะเบียนสำเร็จ! สามารถเข้าสู่ระบบได้เลย");
+      })
+      .catch(error => {
+        alert(error.message);
+      });
+  });
+
+  // เข้าสู่ระบบ
+  document.getElementById('loginBtn').addEventListener('click', () => {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then(userCredential => {
+        alert("เข้าสู่ระบบสำเร็จ!");
+        // Redirect ไปหน้าแบบทดสอบ
+        window.location.href = "quiz.html";
+      })
+      .catch(error => {
+        alert(error.message);
+      });
+  });
+
+</script>
+
+</body>
+</html>
