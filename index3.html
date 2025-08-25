@@ -274,96 +274,42 @@
         <button id="submitBtn" type="submit">ส่งคำตอบ</button>
     </form>
 
-    <div class="popup-overlay" id="popupOverlay">
-        <div class="certificate-container" id="certificate">
-            <span class="close-btn" id="closeBtn">&times;</span>
-            <div class="certificate-header">ใบประกาศนียบัตร</div>
-            <div class="certificate-subtitle">มอบให้เพื่อเป็นเกียรติแก่</div>
-            
-            <div class="name" id="userName">คุณ (ชื่อ-นามสกุล)</div>
-            
-            <div class="certificate-body">
-                ที่ได้ผ่านการทดสอบความรู้<br>
-                **"การขายประกันชีวิตและสุขภาพผ่านทางโทรศัพท์"**
-            </div>
-            
-            <div class="score-box">
-                คะแนนสอบ: <span id="finalScore">กำลังโหลด...</span>
-            </div>
-            
-            <div class="signature">
-                <div class="signature-line"></div>
-                <p>ผู้จัดการฝ่ายฝึกอบรม</p>
-                <p>บริษัท XXX ประกันภัย</p>
-                <p>วันที่: <span id="currentDate"></span></p>
-            </div>
-            
-            <button class="print-btn" onclick="window.print()">พิมพ์ใบประกาศ</button>
-        </div>
+    <!-- Popup Overlay -->
+<div class="popup-overlay" id="popupOverlay" aria-hidden="true">
+  <div class="certificate-container" id="certificate" role="dialog" aria-modal="true" aria-labelledby="certTitle">
+    <button class="close-btn" id="closeBtn" aria-label="ปิดป๊อปอัพ">&times;</button>
+
+    <div class="certificate-content">
+      <div class="certificate-header" id="certTitle">ใบประกาศนียบัตร</div>
+      <div class="certificate-subtitle">มอบให้เพื่อเป็นเกียรติแก่</div>
+
+      <div class="name" id="userName">คุณ (ชื่อ-นามสกุล)</div>
+
+      <div class="certificate-body">
+        ที่ได้ผ่านการทดสอบความรู้<br>
+        <strong>"การขายประกันชีวิตและสุขภาพผ่านทางโทรศัพท์"</strong>
+      </div>
+
+      <div class="score-box">
+        คะแนนสอบ: <span id="finalScore">กำลังโหลด...</span>
+      </div>
+
+      <div class="signature">
+        <div class="signature-line"></div>
+        <p>ผู้จัดการฝ่ายฝึกอบรม</p>
+        <p>บริษัท XXX ประกันภัย</p>
+        <p>วันที่: <span id="currentDate"></span></p>
+      </div>
     </div>
-    
-    <script>
-        const form = document.getElementById('essayForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const popupOverlay = document.getElementById('popupOverlay');
-        const closeBtn = document.getElementById('closeBtn');
 
-        const userNameElement = document.getElementById('userName');
-        const finalScoreElement = document.getElementById('finalScore');
-        const currentDateElement = document.getElementById('currentDate');
-        
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        const quizScore = localStorage.getItem('quizScore');
+    <!-- แถบปุ่มด้านล่างแบบ Sticky -->
+    <div class="action-bar">
+      <button class="btn secondary" id="printBtn" type="button">พิมพ์ใบประกาศ</button>
+      <button class="btn primary" id="nextBtn" type="button">ไปหน้าถัดไป</button>
+    </div>
+  </div>
+</div>
 
-        if (!userData || !userData.fname_th || !quizScore) {
-            alert('ไม่พบข้อมูลการทดสอบ กรุณาทำแบบทดสอบให้ครบถ้วน');
-            window.location.href = 'index1.html';
-        }
 
-        submitBtn.addEventListener('click', function(event) {
-            event.preventDefault();
-
-            const essayAnswers = {};
-            let allAnswered = true;
-            for (let i = 1; i <= 20; i++) {
-                const textarea = document.getElementById(`q${i}`);
-                if (!textarea || textarea.value.trim() === '') {
-                    allAnswered = false;
-                    break;
-                }
-                essayAnswers[`q${i}`] = textarea.value.trim();
-            }
-
-            if (!allAnswered) {
-                alert('กรุณาตอบคำถามให้ครบทุกข้อก่อนส่งคำตอบ');
-                return;
-            }
-
-            localStorage.setItem('essayAnswers', JSON.stringify(essayAnswers));
-            
-            const fullName = `${userData.fname_th} ${userData.lname_th}`;
-            userNameElement.textContent = fullName;
-            finalScoreElement.textContent = `${quizScore} / 50 คะแนน`;
-
-            const today = new Date();
-            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-            currentDateElement.textContent = today.toLocaleDateString('th-TH', dateOptions);
-
-            popupOverlay.style.display = 'flex';
-            setTimeout(() => {
-                popupOverlay.classList.add('show');
-            }, 10);
-        });
-
-        closeBtn.addEventListener('click', function() {
-            popupOverlay.classList.remove('show');
-            setTimeout(() => {
-                popupOverlay.style.display = 'none';
-                window.location.href = 'index4.html';
-            }, 300);
-        });
-    </script>
-</body>
-</html>
 
 
