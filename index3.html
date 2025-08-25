@@ -71,7 +71,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
-            display: none;
+            display: none; /* เริ่มต้นซ่อนไว้ */
             justify-content: center;
             align-items: center;
             z-index: 1000;
@@ -160,6 +160,8 @@
         .print-btn:hover {
             background-color: #005fa3;
         }
+
+        /* --- Media Print for printing only --- */
         @media print {
             body {
                 background-color: #fff;
@@ -172,7 +174,7 @@
                 display: none !important;
             }
             .certificate-container {
-                display: block;
+                display: block; /* Make sure certificate is visible for print */
                 position: static;
                 transform: none;
                 opacity: 1;
@@ -272,45 +274,151 @@
             </div>
         </div>
         <button id="submitBtn" type="submit">ส่งคำตอบ</button>
-   <form id="essayForm">
-  <div id="questions">
-    <!-- ตัวอย่าง textarea 20 ข้อ -->
-    <div><label for="q1">ข้อ 1:</label><textarea id="q1"></textarea></div>
-    <div><label for="q2">ข้อ 2:</label><textarea id="q2"></textarea></div>
-    <!-- ... ทำแบบนี้ต่อจนครบถึง q20 -->
-    <div><label for="q20">ข้อ 20:</label><textarea id="q20"></textarea></div>
+    </form>
+
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="certificate-container" id="certificate">
+            <span class="close-btn" id="closeBtn">&times;</span>
+            <div class="certificate-header">ใบประกาศนียบัตร</div>
+            <div class="certificate-subtitle">มอบให้เพื่อเป็นเกียรติแก่</div>
+            
+            <div class="name" id="userName">คุณ (ชื่อ-นามสกุล)</div>
+            
+            <div class="certificate-body">
+                ที่ได้ผ่านการทดสอบความรู้<br>
+                **"การขายประกันชีวิตและสุขภาพผ่านทางโทรศัพท์"**
+            </div>
+            
+            <div class="score-box">
+                คะแนนสอบ: <span id="finalScore">กำลังโหลด...</span>
+            </div>
+            
+            <div class="signature">
+                <div class="signature-line"></div>
+                <p>ผู้จัดการฝ่ายฝึกอบรม</p>
+                <p>บริษัท XXX ประกันภัย</p>
+                <p>วันที่: <span id="currentDate"></span></p>
+            </div>
+            
+            <button id="submitBtn" type="submit">ส่งคำตอบ</button>
+  </form>
+
+  <!-- ป๊อปอัพ -->
+  <div id="popupOverlay" aria-hidden="true">
+    <div class="popup-content">
+      <h2>ผลการทดสอบ</h2>
+      <p>ชื่อผู้ใช้: <span id="userName"></span></p>
+      <p>คะแนน: <span id="finalScore"></span></p>
+      <p>วันที่: <span id="currentDate"></span></p>
+      <button id="printBtn">พิมพ์ผลลัพธ์</button>
+      <button id="nextBtn">ถัดไป</button>
+      <button id="closeBtn">ปิด</button>
+    </div>
   </div>
-  <button id="submitBtn" type="submit">ส่งคำตอบ</button>
-</form>
 
-<!-- Popup แสดงผล -->
-<div id="popupOverlay" class="popup" style="display:none;" aria-hidden="true">
-  <div class="popup-content">
-    <h2>ผลการทดสอบ</h2>
-    <p>ชื่อผู้ใช้: <span id="userName"></span></p>
-    <p>คะแนน: <span id="finalScore"></span></p>
-    <p>วันที่: <span id="currentDate"></span></p>
-    <button id="printBtn">พิมพ์ผลลัพธ์</button>
-    <button id="nextBtn">ถัดไป</button>
-    <button id="closeBtn">ปิด</button>
-  </div>
-</div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('essayForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const popupOverlay = document.getElementById('popupOverlay');
+      const closeBtn = document.getElementById('closeBtn');
+      const printBtn = document.getElementById('printBtn');
+      const nextBtn = document.getElementById('nextBtn');
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('essayForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const popupOverlay = document.getElementById('popupOverlay');
-    const closeBtn = document.getElementById('closeBtn');
-    const printBtn = document.getElementById('printBtn');
-    const nextBtn = document.getElementById('nextBtn');
+      const userNameElement = document.getElementById('userName');
+      const finalScoreElement = document.getElementById('finalScore');
+      const currentDateElement = document.getElementById('currentDate');
 
-    const userNameElement = document.getElementById('userName');
-    const finalScoreElement = document.getElementById('finalScore');
-    const currentDateElement = document.getElementById('currentDate');
+      const userData = JSON.parse(localStorage.getItem('userData') || 'null');
+      const quizScore = localStorage.getItem('quizScore');
 
-    const userData = JSON.parse(localStorage.getItem('userData') || 'null');
-    const quizScore = localStorage.getItem('quizScore');
+      if (!userData || !userData.fname_th || !quizScore) {
+        alert('ไม่พบข้อมูลการทดสอบ กรุณาทำแบบทดสอบให้ครบถ้วน');
+        window.location.href = 'index1.html';
+        return;
+      }
 
-    const lockBodyScroll = (lock = true) => {
+      submitBtn.addEventListener('click', function(event) {
+        event.preventDefault();
+
+        const essayAnswers = {};
+        let allAnswered = true;
+
+        for (let i = 1; i <= 20; i++) {
+          const textarea = document.getElementById(`q${i}`);
+          if (!textarea || textarea.value.trim() === '') {
+            allAnswered = false;
+            break;
+          }
+          essayAnswers[`q${i}`] = textarea.value.trim();
+        }
+
+        if (!allAnswered) {
+          alert('กรุณาตอบคำถามให้ครบทุกข้อก่อนส่งคำตอบ');
+          return;
+        }
+
+        localStorage.setItem('essayAnswers', JSON.stringify(essayAnswers));
+
+        const fullName = `${userData.fname_th} ${userData.lname_th || ''}`.trim();
+        userNameElement.textContent = fullName;
+        finalScoreElement.textContent = `${quizScore} / 50 คะแนน`;
+
+        const today = new Date();
+        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+        currentDateElement.textContent = today.toLocaleDateString('th-TH', dateOptions);
+
+        popupOverlay.style.display = 'flex';
+        requestAnimationFrame(() => {
+          popupOverlay.classList.add('show');
+          popupOverlay.setAttribute('aria-hidden', 'false');
+        });
+      });
+
+      closeBtn.addEventListener('click', () => {
+        popupOverlay.classList.remove('show');
+        popupOverlay.setAttribute('aria-hidden', 'true');
+        setTimeout(() => {
+          popupOverlay.style.display = 'none';
+          window.location.href = 'index4.html';
+        }, 300);
+      });
+
+      printBtn.addEventListener('click', () => window.print());
+      nextBtn.addEventListener('click', () => {
+        popupOverlay.classList.remove('show');
+        popupOverlay.setAttribute('aria-hidden', 'true');
+        setTimeout(() => {
+          popupOverlay.style.display = 'none';
+          window.location.href = 'index4.html';
+        }, 300);
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && popupOverlay.classList.contains('show')) {
+          popupOverlay.classList.remove('show');
+          popupOverlay.setAttribute('aria-hidden', 'true');
+          setTimeout(() => {
+            popupOverlay.style.display = 'none';
+            window.location.href = 'index4.html';
+          }, 300);
+        }
+      });
+
+      popupOverlay.addEventListener('click', (e) => {
+        if (e.target === popupOverlay) {
+          popupOverlay.classList.remove('show');
+          popupOverlay.setAttribute('aria-hidden', 'true');
+          setTimeout(() => {
+            popupOverlay.style.display = 'none';
+            window.location.href = 'index4.html';
+          }, 300);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
      
+
