@@ -272,86 +272,45 @@
             </div>
         </div>
         <button id="submitBtn" type="submit">ส่งคำตอบ</button>
-    </form>
+   <form id="essayForm">
+  <div id="questions">
+    <!-- ตัวอย่าง textarea 20 ข้อ -->
+    <div><label for="q1">ข้อ 1:</label><textarea id="q1"></textarea></div>
+    <div><label for="q2">ข้อ 2:</label><textarea id="q2"></textarea></div>
+    <!-- ... ทำแบบนี้ต่อจนครบถึง q20 -->
+    <div><label for="q20">ข้อ 20:</label><textarea id="q20"></textarea></div>
+  </div>
+  <button id="submitBtn" type="submit">ส่งคำตอบ</button>
+</form>
+
+<!-- Popup แสดงผล -->
+<div id="popupOverlay" class="popup" style="display:none;" aria-hidden="true">
+  <div class="popup-content">
+    <h2>ผลการทดสอบ</h2>
+    <p>ชื่อผู้ใช้: <span id="userName"></span></p>
+    <p>คะแนน: <span id="finalScore"></span></p>
+    <p>วันที่: <span id="currentDate"></span></p>
+    <button id="printBtn">พิมพ์ผลลัพธ์</button>
+    <button id="nextBtn">ถัดไป</button>
+    <button id="closeBtn">ปิด</button>
+  </div>
+</div>
 
 <script>
-  const form = document.getElementById('essayForm');
-  const submitBtn = document.getElementById('submitBtn');
-  const popupOverlay = document.getElementById('popupOverlay');
-  const closeBtn = document.getElementById('closeBtn');
-  const printBtn = document.getElementById('printBtn');
-  const nextBtn = document.getElementById('nextBtn');
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('essayForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const popupOverlay = document.getElementById('popupOverlay');
+    const closeBtn = document.getElementById('closeBtn');
+    const printBtn = document.getElementById('printBtn');
+    const nextBtn = document.getElementById('nextBtn');
 
-  const userNameElement = document.getElementById('userName');
-  const finalScoreElement = document.getElementById('finalScore');
-  const currentDateElement = document.getElementById('currentDate');
+    const userNameElement = document.getElementById('userName');
+    const finalScoreElement = document.getElementById('finalScore');
+    const currentDateElement = document.getElementById('currentDate');
 
-  const userData = JSON.parse(localStorage.getItem('userData') || 'null');
-  const quizScore = localStorage.getItem('quizScore');
+    const userData = JSON.parse(localStorage.getItem('userData') || 'null');
+    const quizScore = localStorage.getItem('quizScore');
 
-  // ล็อก/ปลดล็อกการเลื่อนของพื้นหลัง
-  const lockBodyScroll = (lock = true) => {
-    document.documentElement.style.overflow = lock ? 'hidden' : '';
-    document.body.style.overflow = lock ? 'hidden' : '';
-  };
-
-  const openPopup = () => {
-    popupOverlay.style.display = 'flex';
-    requestAnimationFrame(() => {
-      popupOverlay.classList.add('show');
-      popupOverlay.setAttribute('aria-hidden', 'false');
-    });
-    lockBodyScroll(true);
-    nextBtn?.focus();
-  };
-
-  const closeAndGoNext = () => {
-    popupOverlay.classList.remove('show');
-    popupOverlay.setAttribute('aria-hidden', 'true');
-    setTimeout(() => {
-      popupOverlay.style.display = 'none';
-      lockBodyScroll(false);
-      window.location.href = 'index4.html';
-    }, 200);
-  };
-
-  if (!userData || !userData.fname_th || !quizScore) {
-    alert('ไม่พบข้อมูลการทดสอบ กรุณาทำแบบทดสอบให้ครบถ้วน');
-    window.location.href = 'index1.html';
-  }
-
-  submitBtn.addEventListener('click', function(event) {
-    event.preventDefault();
-
-    const essayAnswers = {};
-    let allAnswered = true;
-    for (let i = 1; i <= 20; i++) {
-      const textarea = document.getElementById(`q${i}`);
-      if (!textarea || textarea.value.trim() === '') {
-        allAnswered = false;
-        break;
-      }
-      essayAnswers[`q${i}`] = textarea.value.trim();
-    }
-
-    if (!allAnswered) {
-      alert('กรุณาตอบคำถามให้ครบทุกข้อก่อนส่งคำตอบ');
-      return;
-    }
-
-    localStorage.setItem('essayAnswers', JSON.stringify(essayAnswers));
-
-    const fullName = `${userData.fname_th} ${userData.lname_th || ''}`.trim();
-    userNameElement.textContent = fullName;
-    finalScoreElement.textContent = `${quizScore} / 50 คะแนน`;
-
-    const today = new Date();
-    const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    currentDateElement.textContent = today.toLocaleDateString('th-TH', dateOptions);
-
-    openPopup();
-  });
-
-  closeBtn.addEventListener('click', closeAndGoNext);
-  printBtn.addEventListener('click', () => window.print());
- 
+    const lockBodyScroll = (lock = true) => {
+     
