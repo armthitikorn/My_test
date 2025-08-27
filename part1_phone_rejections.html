@@ -205,7 +205,7 @@
             }, 3000);
         }
         
-       // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
             apiKey: "AIzaSyA4OrZERUoxWPiShCEWVvz1MK9cYGO3_K8",
             authDomain: "new-record-3ccd6.firebaseapp.com",
@@ -374,13 +374,14 @@
                 const snapshots = await Promise.all(uploadPromises);
 
                 const firestorePromises = snapshots.map(async (snapshot, i) => {
-                    const url = await getDownloadURL(snapshot.ref);
+                    // ส่วนที่แก้ไข: บันทึกเฉพาะชื่อไฟล์ลงใน Firestore
+                    const fileName = snapshot.ref.name;
                     return addDoc(collection(db, 'submissions_part1'), {
                         uid: currentUser.uid,
                         email: currentUser.email || 'anonymous',
                         question: i + 1,
                         text: questions[i],
-                        audioUrl: url,
+                        audioUrl: fileName, // บันทึกแค่ชื่อไฟล์
                         timestamp: new Date()
                     });
                 });
@@ -403,6 +404,3 @@
     </script>
 </body>
 </html>
-
-
-
