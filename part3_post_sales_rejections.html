@@ -376,7 +376,7 @@
                 const firestorePromises = snapshots.map(async (snapshot, i) => {
                     // โค้ดที่ได้รับการแก้ไข: บันทึกแค่ชื่อไฟล์ลงใน Firestore
                     const fileName = snapshot.ref.name; 
-                    return addDoc(collection(db, 'submissions_part3'), {
+                    return addDoc(collection(db, 'submissions_part1'), {
                         uid: currentUser.uid,
                         email: currentUser.email || 'anonymous',
                         question: i + 1,
@@ -404,5 +404,6 @@
     </script>
 </body>
 </html>
+
 
 
