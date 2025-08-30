@@ -348,57 +348,58 @@
             }
         }
 
-        async function uploadAll() {
-            if (!currentUser) {
-                return showMessage("ไม่พบผู้ใช้ กรุณาลองเข้าสู่ระบบใหม่", "error");
-            }
+       async function uploadAll() {
+    // ... (rest of your code) ...
 
-            const allRecorded = questions.every((_, i) => audioChunks[i] && audioChunks[i].length > 0);
-            if (!allRecorded) {
-                return showMessage("กรุณาอัดเสียงให้ครบทุกข้อก่อน", "error");
-            }
+    try {
+        const fileData = questions.map((_, i) => ({
+            blob: new Blob(audioChunks[i], { type: 'audio/mp4' }),
+            fileName: `${currentUser.uid}_part1_answer${i + 1}.mp4`,
+            questionIndex: i
+        }));
 
-            const loadingOverlay = document.getElementById("loadingOverlay");
-            loadingOverlay.style.display = "flex";
+        const firestoreData = [];
 
-            try {
-                const uploadPromises = questions.map((_, i) => {
-                    const blob = new Blob(audioChunks[i], { type: 'audio/mp4' });
-                    const fileName = `${currentUser.uid}_part1_answer${i+1}.mp4`;
-                    const storageRef = ref(storage, `audios/${currentUser.uid}/${fileName}`);
-                    return uploadBytesResumable(storageRef, blob);
-                });
-                
-                const snapshots = await Promise.all(uploadPromises);
+        for (const { blob, fileName, questionIndex } of fileData) {
+            const storageRef = ref(storage, `audios/${currentUser.uid}/${fileName}`);
+            const uploadTask = uploadBytesResumable(storageRef, blob);
 
-                const firestorePromises = snapshots.map(async (snapshot, i) => {
-                    const url = await getDownloadURL(snapshot.ref);
-                    return addDoc(collection(db, 'submissions_part1'), {
-                        uid: currentUser.uid,
-                        email: currentUser.email || 'anonymous',
-                        question: i + 1,
-                        text: questions[i],
-                        audioUrl: url,
-                        timestamp: new Date()
-                    });
-                });
+            // You can add a progress listener here if you want to update the UI
+            // uploadTask.on('state_changed', (snapshot) => {
+            //     const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            //     console.log(`Upload of ${fileName} is ${progress}% done`);
+            // });
 
-                await Promise.all(firestorePromises);
+            await uploadTask; // Wait for the current upload to finish before continuing
+            const url = await getDownloadURL(uploadTask.snapshot.ref);
 
-                showMessage("ส่งไฟล์เสียงทั้งหมดเรียบร้อยแล้ว!", "info");
-                setTimeout(() => {
-                    window.location.href = "part2_health_questions.html"; // เปลี่ยนเป็นไฟล์ถัดไป
-                }, 2000);
-            } catch (err) {
-                console.error('เกิดข้อผิดพลาดในการอัปโหลด', err);
-                showMessage("เกิดข้อผิดพลาดในการส่งไฟล์เสียง", "error");
-            } finally {
-                loadingOverlay.style.display = "none";
-            }
+            firestoreData.push({
+                uid: currentUser.uid,
+                email: currentUser.email || 'anonymous',
+                question: questionIndex + 1,
+                text: questions[questionIndex],
+                audioUrl: url,
+                timestamp: new Date()
+            });
         }
+
+        await Promise.all(firestoreData.map(data => addDoc(collection(db, 'submissions_part1'), data)));
+
+        showMessage("ส่งไฟล์เสียงทั้งหมดเรียบร้อยแล้ว!", "info");
+        setTimeout(() => {
+            window.location.href = "part2_health_questions.html";
+        }, 2000);
+    } catch (err) {
+        console.error('เกิดข้อผิดพลาดในการอัปโหลด', err);
+        showMessage("เกิดข้อผิดพลาดในการส่งไฟล์เสียง", "error");
+    } finally {
+        loadingOverlay.style.display = "none";
+    }
+}
 
         document.getElementById('submitAllBtn').addEventListener('click', uploadAll);
     </script>
 </body>
 </html>
+
 
