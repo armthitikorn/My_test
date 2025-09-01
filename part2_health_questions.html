@@ -401,14 +401,16 @@
                     });
 
                     const url = await getDownloadURL(uploadTask.snapshot.ref);
-                    firestorePromises.push(addDoc(collection(db, 'submissions_part2'), { // แก้ไขตรงนี้ครับ
-                        uid: currentUser.uid,
-                        email: currentUser.email || 'anonymous',
-                        question: i + 1,
-                        text: questions[i],
-                        audioUrl: url,
-                        timestamp: new Date()
-                    }));
+                  firestorePromises.push(addDoc(collection(db, 'submissions_part1'), {
+    uid: currentUser.uid,
+    email: currentUser.email || 'anonymous',
+    question: i + 1,
+    // เพิ่มข้อมูลที่ระบุว่าเป็น Part 2
+    part: 2,
+    text: questions[i],
+    audioUrl: url,
+    timestamp: new Date()
+}));
                 }
 
                 await Promise.all(firestorePromises);
@@ -429,6 +431,7 @@
     </script>
 </body>
 </html>
+
 
 
 
