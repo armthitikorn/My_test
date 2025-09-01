@@ -207,14 +207,14 @@
         
         
 const firebaseConfig = {
-    apiKey: "AIzaSyA4OrZERUoxWPiShCEWVvz1MK9cYGO3_K8",
-    authDomain: "new-record-3ccd6.firebaseapp.com",
-    databaseURL: "https://new-record-3ccd6-default-rtdb.firebaseio.com",
-    projectId: "new-record-3ccd6",
-    storageBucket: "new-record-3ccd6.appspot.com", // ✅ แก้ให้ถูกต้อง
-    messagingSenderId: "1065863160189",
-    appId: "1:1065863160189:web:853d594b8d17adff126c14",
-    measurementId: "G-ZY9B2K18X3"
+            apiKey: "AIzaSyA4OrZERUoxWPiShCEWVvz1MK9cYGO3_K8",
+            authDomain: "new-record-3ccd6.firebaseapp.com",
+            projectId: "new-record-3ccd6",
+            // แก้ไขตรงนี้ครับ ให้ใช้ชื่อ Bucket ที่ถูกต้องจากคำสั่ง gsutil ls
+            storageBucket: "new-record-3ccd6.firebasestorage.app",
+            messagingSenderId: "1065863160189",
+            appId: "1:1065863160189:web:853d594b8d17adff126c14",
+            measurementId: "G-ZY9B2K18X3"
   };
 
         let app, storage, db, auth;
@@ -425,5 +425,6 @@ const firebaseConfig = {
     </script>
 </body>
 </html>
+
 
 
