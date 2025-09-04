@@ -145,7 +145,7 @@
 
         if (!userData || !userData.fname_th) {
             alert("ไม่พบข้อมูลผู้ใช้ กรุณากรอกข้อมูลก่อนเริ่มทำแบบทดสอบ");
-            window.location.href = 'part1_phone_rejections.html';
+            window.location.href = 'index3.html';
         }
 
         function createQuiz() {
@@ -194,7 +194,7 @@
 
             if (score >= 4) {
                 alert(`คุณได้คะแนน ${score} จาก ${questions.length} คะแนน ยินดีด้วย คุณผ่านเกณฑ์แล้ว!`);
-                window.location.href = 'part1_phone_rejections.html';
+                window.location.href = 'index3.html';
             } else {
                 alert(`คุณได้คะแนน ${score} จาก ${questions.length} คะแนน ซึ่งไม่ผ่านเกณฑ์ (4 ข้อ)`);
                 resultDiv.textContent = `คะแนนของคุณคือ: ${score} จาก ${questions.length} คะแนน`;
@@ -208,5 +208,6 @@
 </body>
 
 </html>
+
 
 
