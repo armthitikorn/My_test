@@ -42,7 +42,7 @@
     </style>
 </head>
 <body>
-    <h2>แบบทดสอบอัตนัย: ความกังวลของลูกค้าเกี่ยวกับการประกันสุขภาพ</h2>
+   <h2>แบบทดสอบอัตนัย: ความกังวลของลูกค้าเกี่ยวกับการประกันสุขภาพ</h2>
     <form id="healthConcernForm">
         <div class="question-group">
             <div class="question">
@@ -91,19 +91,16 @@
 
     <script>
         document.getElementById("healthConcernForm").addEventListener("submit", function(event) {
-            event.preventDefault(); // ป้องกันการ reload หน้า
+            event.preventDefault();
 
-            // ไปยังหน้าถัดไป
-            window.location.href = "part1_phone_rejections.html";
+            const answers = {};
+            for (let i = 1; i <= 10; i++) {
+                answers[`q${i}`] = document.getElementById(`q${i}`).value;
+            }
+
+            localStorage.setItem("healthAnswers", JSON.stringify(answers));
+            window.location.href = "summary.html"; // ไปยังหน้าสรุป
         });
     </script>
 </body>
 </html>
-
-
-  
-
-     
-
-
-
