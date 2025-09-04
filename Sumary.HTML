@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>สรุปคำตอบแบบทดสอบ</title>
+    https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            padding: 20px;
+            background-color: #fff;
+        }
+        h2 {
+            color: #333;
+        }
+        .answer {
+            margin-bottom: 15px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <h2>สรุปคำตอบแบบทดสอบอัตนัย</h2>
+    <div id="answerDisplay"></div>
+    <button id="downloadBtn">ดาวน์โหลดคำตอบ</button>
+    <button onclick="window.location.href='part1_phone_rejections.html'">ไปยังขั้นตอนถัดไป</button>
+
+    <script>
+        const answers = JSON.parse(localStorage.getItem("healthAnswers"));
+        const display = document.getElementById("answerDisplay");
+
+        if (answers) {
+            for (let i = 1; i <= 10; i++) {
+                const div = document.createElement("div");
+                div.className = "answer";
+                div.textContent = `ข้อ ${i}: ${answers[`q${i}`]}`;
+                display.appendChild(div);
+            }
+        } else {
+            display.textContent = "ไม่พบคำตอบในระบบ";
+        }
+
+        document.getElementById("downloadBtn").addEventListener("click", function() {
+            let content = "คำตอบแบบทดสอบอัตนัย:\n\n";
+            for (let i = 1; i <= 10; i++) {
+                content += `ข้อ ${i}: ${answers[`q${i}`]}\n\n`;
+            }
+
+            const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "คำตอบแบบทดสอบ.txt";
+            link.click();
+        });
+    </script>
+</body>
+</html>
