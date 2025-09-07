@@ -182,5 +182,206 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+        
+        function showMessage(text, type = 'info') {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = text;
+            messageBox.style.display = 'block';
+            if (type === 'error') {
+                messageBox.style.backgroundColor = '#f8d7da';
+                messageBox.style.color = '#721c24';
+                messageBox.style.borderColor = '#f5c6cb';
+            } else {
+                messageBox.style.backgroundColor = '#d1e7dd';
+                messageBox.style.color = '#0f5132';
+                messageBox.style.borderColor = '#badbcc';
+            }
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 3000);
+        }
+        
+const firebaseConfig = {
+            apiKey: "AIzaSyA4OrZERUoxWPiShCEWVvz1MK9cYGO3_K8",
+            authDomain: "new-record-3ccd6.firebaseapp.com",
+            projectId: "new-record-3ccd6",
+            storageBucket: "new-record-3ccd6.appspot.com",
+            messagingSenderId: "1065863160189",
+            appId: "1:1065863160189:web:853d594b8d17adff126c14",
+            measurementId: "G-ZY9B2K18X3"
+  };
 
+        let app, storage, db;
+        // สร้าง object ผู้ใช้สมมติเพื่อใช้ในการอัปโหลด
+        const currentUser = {
+            uid: "anonymous_user",
+            email: "anonymous@example.com"
+        };
+
+        window.onload = () => {
+            if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("YOUR_API_KEY")) {
+                showMessage("เกิดข้อผิดพลาด: API Key ไม่ถูกต้อง โปรดตรวจสอบการตั้งค่า Firebase", "error");
+                console.error("Firebase Initialization Error: API Key is not valid.");
+                return;
+            }
+
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            storage = getStorage(app);
+            // แสดงชื่อผู้ใช้สมมติในหน้าเว็บ
+            document.getElementById("userNameDisplay").textContent = currentUser.email;
+        };
+
+        const questions = [
+            "ประกันยังไม่สนใจ",
+            "ไม่อยากฟังอะไรทั้งนั้น ประกันก็เหมือนๆกัน",
+            "มีเยอะทำเพิ่มไม่ไหวแล้ว",
+            "เอาข้อมูลมาจากไหน",
+            "ขอเอกสารมาอ่านก่อน"
+        ];
+
+        const container = document.getElementById("questions");
+        let audioChunks = {};
+        let mediaRecorder;
+
+        questions.forEach((q, i) => {
+            const div = document.createElement("div");
+            div.className = "question";
+            div.innerHTML = `
+                <p><b>${i+1}. ${q}</b></p>
+                <div class="control-buttons">
+                    <button class="start-btn" data-index="${i}">
+                        <i class="fas fa-microphone"></i> เริ่มอัดเสียง
+                    </button>
+                    <button class="stop-btn" data-index="${i}" disabled>
+                        <i class="fas fa-stop-circle"></i> หยุดอัดเสียง
+                    </button>
+                    <button class="play-btn" data-index="${i}" disabled>
+                        <i class="fas fa-play-circle"></i> ฟังเสียง
+                    </button>
+                    <audio id="audio${i}" controls style="display:none;"></audio>
+                    <span class="file-size" id="fileSize${i}"></span>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+
+        document.addEventListener('click', e => {
+            const target = e.target.closest('button');
+            if (!target) return;
+            const index = target.getAttribute('data-index');
+
+            if (target.classList.contains('start-btn')) {
+                startRecording(index);
+            } else if (target.classList.contains('stop-btn')) {
+                stopRecording(index);
+            } else if (target.classList.contains('play-btn')) {
+                playRecording(index);
+            }
+        });
+
+        async function startRecording(index) {
+            if (!navigator.mediaDevices) {
+                showMessage("เบราว์เซอร์นี้ไม่รองรับการอัดเสียง", "error");
+                return;
+            }
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const options = { mimeType: 'audio/mp4', audioBitsPerSecond: 16000 };
+                mediaRecorder = new MediaRecorder(stream, options);
+
+                audioChunks[index] = [];
+                mediaRecorder.ondataavailable = e => { 
+                    if(e.data.size > 0) {
+                        audioChunks[index].push(e.data);
+                    }
+                };
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(audioChunks[index], { type: 'audio/mp4' });
+                    const url = URL.createObjectURL(blob);
+                    const audioEl = document.getElementById("audio" + index);
+                    audioEl.src = url;
+                    audioEl.style.display = "block";
+                    document.querySelector(`.play-btn[data-index="${index}"]`).disabled = false;
+                    
+                    const fileSizeKB = (blob.size / 1024).toFixed(2);
+                    document.getElementById(`fileSize${index}`).textContent = `ขนาดไฟล์: ${fileSizeKB} KB`;
+                    
+                    showMessage("บันทึกเสียงเรียบร้อยแล้ว", "info");
+                };
+
+                mediaRecorder.start();
+                document.querySelector(`.start-btn[data-index="${index}"]`).disabled = true;
+                document.querySelector(`.stop-btn[data-index="${index}"]`).disabled = false;
+                document.querySelector(`.play-btn[data-index="${index}"]`).disabled = true;
+            } catch (err) {
+                console.error("Media recording error:", err);
+                showMessage("ไม่สามารถเข้าถึงไมโครโฟนได้ กรุณาตรวจสอบสิทธิ์", "error");
+            }
+        }
+
+        function stopRecording(index) {
+            if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+                document.querySelector(`.start-btn[data-index="${index}"]`).disabled = false;
+                document.querySelector(`.stop-btn[data-index="${index}"]`).disabled = true;
+            }
+        }
+
+        function playRecording(index) {
+            const audioEl = document.getElementById("audio" + index);
+            if (audioEl.src) {
+                audioEl.play();
+            } else {
+                showMessage("ไม่มีไฟล์เสียงให้เล่น", "error");
+            }
+        }
+
+        async function uploadAll() {
+            if (!currentUser) {
+                return showMessage("ไม่พบผู้ใช้ กรุณาลองเข้าสู่ระบบใหม่", "error");
+            }
+
+            const allRecorded = questions.every((_, i) => audioChunks[i] && audioChunks[i].length > 0);
+            if (!allRecorded) {
+                return showMessage("กรุณาอัดเสียงให้ครบทุกข้อก่อน", "error");
+            }
+
+            const loadingOverlay = document.getElementById("loadingOverlay");
+            const loadingText = document.getElementById("loadingText");
+            const progressBar = document.getElementById("progressBar");
+            loadingOverlay.style.display = "flex";
+
+            try {
+                const blobs = questions.map((_, i) => new Blob(audioChunks[i], { type: 'audio/mp4' }));
+                const totalSize = blobs.reduce((sum, blob) => sum + blob.size, 0);
+                let totalUploaded = 0;
+
+                const firestorePromises = [];
+
+                for (let i = 0; i < blobs.length; i++) {
+                    const blob = blobs[i];
+                    const fileName = `${currentUser.uid}_part1_answer${i + 1}.mp4`;
+                    const storageRef = ref(storage, `audios/${currentUser.uid}/${fileName}`);
+                    const uploadTask = uploadBytesResumable(storageRef, blob);
+
+                    await new Promise((resolve, reject) => {
+                        uploadTask.on('state_changed',
+                            (snapshot) => {
+                                const progress = (snapshot.bytesTransferred / snapshot.totalBytes);
+                                const overallProgress = ((totalUploaded + snapshot.bytesTransferred) / totalSize) * 100;
+                                loadingText.textContent = `กำลังอัปโหลดไฟล์ที่ ${i+1} จาก ${blobs.length}... (${Math.round(overallProgress)}%)`;
+                                progressBar.style.width = `${overallProgress}%`;
+                            },
+                            (error) => {
+                                reject(error);
+                            },
+                            () => {
+                                totalUploaded += blob.size;
+                                resolve();
+                            }
+                        );
+                    });
