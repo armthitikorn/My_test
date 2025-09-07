@@ -221,7 +221,7 @@ const firebaseConfig = {
         let currentUser = null;
 
         window.onload = () => {
-            if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("YOUR_API_KEY")) {
+            if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("AIzaSyA4OrZERUoxWPiShCEWVvz1MK9cYGO3_K8")) {
                 showMessage("เกิดข้อผิดพลาด: API Key ไม่ถูกต้อง โปรดตรวจสอบการตั้งค่า Firebase", "error");
                 console.error("Firebase Initialization Error: API Key is not valid.");
                 return;
@@ -425,5 +425,6 @@ const firebaseConfig = {
     </script>
 </body>
 </html>
+
 
 
