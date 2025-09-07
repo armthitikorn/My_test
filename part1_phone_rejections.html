@@ -385,3 +385,35 @@ const firebaseConfig = {
                             }
                         );
                     });
+                   const url = await getDownloadURL(uploadTask.snapshot.ref);
+                    firestorePromises.push(addDoc(collection(db, 'submissions_part1'), {
+                        uid: currentUser.uid,
+                        email: currentUser.email || 'anonymous',
+                        question: i + 1,
+                        text: questions[i],
+                        audioUrl: url,
+                        timestamp: new Date()
+                    }));
+                }
+
+                await Promise.all(firestorePromises);
+
+                showMessage("ส่งไฟล์เสียงทั้งหมดเรียบร้อยแล้ว!", "info");
+                setTimeout(() => {
+                    window.location.href = "part2_health_questions.html";
+                }, 2000);
+            } catch (err) {
+                console.error('เกิดข้อผิดพลาดในการอัปโหลด', err);
+                showMessage("เกิดข้อผิดพลาดในการส่งไฟล์เสียง", "error");
+            } finally {
+                loadingOverlay.style.display = "none";
+            }
+        }
+
+        document.getElementById('submitAllBtn').addEventListener('click', uploadAll);
+    </script>
+</body>
+</html>
+
+
+
